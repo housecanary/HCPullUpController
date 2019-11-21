@@ -90,9 +90,9 @@ open class PullUpController: UIViewController {
      At the end of the gesture the pull up controller will scroll at the nearest point in the list.
      */
     public final var pullUpControllerAllStickyPoints: [CGFloat] {
-        var sc_allStickyPoints = [initialStickyPointOffset, pullUpControllerPreferredSize.height].compactMap { $0 }
-        sc_allStickyPoints.append(contentsOf: pullUpControllerMiddleStickyPoints)
-        return sc_allStickyPoints.sorted()
+        var allStickyPoints = [initialStickyPointOffset, pullUpControllerPreferredSize.height].compactMap { $0 }
+        allStickyPoints.append(contentsOf: pullUpControllerMiddleStickyPoints)
+        return allStickyPoints.sorted()
     }
     
     private var leftConstraint: NSLayoutConstraint?
@@ -349,8 +349,9 @@ open class PullUpController: UIViewController {
             
         case .ended:
             scrollView.bounces = true
-            goToNearestStickyPoint(verticalVelocity: gestureRecognizer.velocity(in: view).y)
-            
+            if scrollView.contentOffset.y <= 0 {
+                goToNearestStickyPoint(verticalVelocity: gestureRecognizer.velocity(in: view).y)
+            }
         default:
             break
         }
@@ -439,7 +440,7 @@ open class PullUpController: UIViewController {
         } else {
             topConstraint?.constant = nearestStickyPointY(yVelocity: 0)
         }
-        leftConstraint?.constant = (parentViewSize.width - min(pullUpControllerPreferredSize.width, parentViewSize.width))/2
+        leftConstraint?.constant = 0
         widthConstraint?.constant = pullUpControllerPreferredSize.width
         heightConstraint?.constant = pullUpControllerPreferredSize.height
         heightConstraint?.priority = .defaultLow
