@@ -102,10 +102,6 @@ open class PullUpController: UIViewController {
     private var heightConstraint: NSLayoutConstraint?
     private var panGestureRecognizer: UIPanGestureRecognizer?
     
-    private var isPortrait: Bool {
-        return UIScreen.main.bounds.height > UIScreen.main.bounds.width
-    }
-    
     private var portraitPreviousStickyPointIndex: Int?
     
     fileprivate weak var internalScrollView: UIScrollView?
@@ -152,7 +148,6 @@ open class PullUpController: UIViewController {
      */
     open func pullUpControllerMoveToVisiblePoint(_ visiblePoint: CGFloat, animated: Bool, completion: (() -> Void)?) {
         guard
-            isPortrait,
             let parentViewHeight = parent?.view.frame.height
             else { return }
         topConstraint?.constant = parentViewHeight - visiblePoint
@@ -237,7 +232,6 @@ open class PullUpController: UIViewController {
         view.frame = CGRect(origin: CGPoint(x: view.frame.origin.x,
                                             y: superview.bounds.height),
                             size: view.frame.size)
-        
         setupPanGestureRecognizer()
         setupConstraints()
         refreshConstraints(newSize: superview.frame.size,
@@ -305,7 +299,6 @@ open class PullUpController: UIViewController {
     
     @objc private func handleScrollViewGestureRecognizer(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard
-            isPortrait,
             let scrollView = internalScrollView,
             let topConstraint = topConstraint,
             let lastStickyPoint = pullUpControllerAllStickyPoints.last,
@@ -360,7 +353,6 @@ open class PullUpController: UIViewController {
     
     @objc private func handlePanGestureRecognizer(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard
-            isPortrait,
             let topConstraint = topConstraint
             else { return }
         
@@ -381,7 +373,6 @@ open class PullUpController: UIViewController {
     
     private func goToNearestStickyPoint(verticalVelocity: CGFloat) {
         guard
-            isPortrait,
             let topConstraint = topConstraint
             else { return }
         let targetTopOffset = nearestStickyPointY(yVelocity: verticalVelocity)  // v = px/s
