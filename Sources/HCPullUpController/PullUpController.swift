@@ -147,6 +147,7 @@ open class PullUpController: UIViewController {
      - parameter completion: The closure to execute after the animation is completed. This block has no return value and takes no parameters. You may specify nil for this parameter.
      */
     open func pullUpControllerMoveToVisiblePoint(_ visiblePoint: CGFloat, animated: Bool, completion: (() -> Void)?) {
+        print("pullUpControllerMoveToVisiblePoint")
         guard
             let parentViewHeight = parent?.view.frame.height
             else { return }
@@ -170,6 +171,8 @@ open class PullUpController: UIViewController {
      - parameter animated: Pass true to animate the resize; otherwise, pass false.
     */
     open func updatePreferredFrameIfNeeded(animated: Bool) {
+        print("updatePreferredFrameIfNeeded")
+
         guard
             let parentView = parent?.view
             else { return }
@@ -198,6 +201,7 @@ open class PullUpController: UIViewController {
                                       withDuration duration: TimeInterval,
                                       animations: @escaping () -> Void,
                                       completion: ((Bool) -> Void)?) {
+        print("pullUpControllerAnimate")
         UIView.animate(withDuration: duration, animations: animations, completion: completion)
     }
     
@@ -372,6 +376,7 @@ open class PullUpController: UIViewController {
     }
     
     private func goToNearestStickyPoint(verticalVelocity: CGFloat) {
+        print("goToNearestStickyPoint")
         guard
             let topConstraint = topConstraint
             else { return }
@@ -384,6 +389,7 @@ open class PullUpController: UIViewController {
     private func setTopOffset(_ value: CGFloat,
                               animationDuration: TimeInterval? = nil,
                               allowBounce: Bool = false) {
+        print("setTopOffset")
         guard
             let parentViewHeight = parent?.view.frame.height
             else { return }
