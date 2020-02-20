@@ -173,7 +173,13 @@ open class PullUpController: UIViewController {
                                       completion: ((Bool) -> Void)?) {
         UIView.animate(withDuration: duration, animations: animations, completion: completion)
     }
-    
+
+    open override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        setupConstraints(initialPoint: pullUpControllerCurrentPointOffset)
+        parent?.view?.layoutIfNeeded()
+    }
+
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         setupConstraints(initialPoint: pullUpControllerCurrentPointOffset)
