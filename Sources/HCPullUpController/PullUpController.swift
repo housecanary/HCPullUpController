@@ -143,8 +143,9 @@ open class PullUpController: UIViewController {
      - parameter animated: Pass true to animate the move; otherwise, pass false.
      - parameter completion: The closure to execute after the animation is completed. This block has no return value and takes no parameters. You may specify nil for this parameter.
      */
-    open func pullUpControllerMoveToVisiblePoint(_ visiblePoint: CGFloat, animated: Bool, completion: (() -> Void)?) {
-        bottomConstraint?.constant = pullUpHeight - visiblePoint
+    open func pullUpControllerMoveToVisiblePoint(_ visiblePoint: CGFloat, animated: Bool, completion: (() -> Void)? = nil) {
+        let targetPoint = pullUpHeight - visiblePoint
+        bottomConstraint?.constant = targetPoint
         pullUpControllerWillMove(to: visiblePoint)
         pullUpControllerAnimate(
             action: .move,
@@ -167,17 +168,11 @@ open class PullUpController: UIViewController {
      - parameter animations: A block object containing the changes to commit to the views.
      - parameter completion: A block object to be executed when the animation sequence ends.
     */
-    open func pullUpControllerAnimate(action: Action,
+    final func pullUpControllerAnimate(action: Action,
                                       withDuration duration: TimeInterval,
                                       animations: @escaping () -> Void,
                                       completion: ((Bool) -> Void)?) {
         UIView.animate(withDuration: duration, animations: animations, completion: completion)
-    }
-
-    open override func viewSafeAreaInsetsDidChange() {
-        super.viewSafeAreaInsetsDidChange()
-        setupConstraints(initialPoint: pullUpControllerCurrentPointOffset)
-        parent?.view?.layoutIfNeeded()
     }
 
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -393,9 +388,8 @@ open class PullUpController: UIViewController {
     }
     
     fileprivate func hide() {
-        bottomConstraint?.constant = -pullUpHeight
+        bottomConstraint?.constant = pullUpHeight
     }
-    
 }
 
 extension UIViewController {
@@ -406,23 +400,12 @@ extension UIViewController {
      - parameter initialPoint: The point where the provided `pullUpController`'s view will be initially placed expressed in screen units of the pull up controller coordinate system. If this value is not provided, the `pullUpController`'s view will be initially placed expressed
      - parameter animated: Pass true to animate the adding; otherwise, pass false.
      */
-    open func addPullUpController(_ pullUpController: PullUpController,
-                                  initialPoint: CGFloat,
-                                  animated: Bool) {
+    open func addPullUpController(_ pullUpController: PullUpController) {
         assert(!(self is UITableViewController), "It's not possible to attach a PullUpController to a UITableViewController. Check this issue for more information: https://github.com/MarioIannotta/PullUpController/issues/14")
         addChild(pullUpController)
-        pullUpController.setup(superview: view, initialPoint: initialPoint)
-        if animated {
-            pullUpController.pullUpControllerAnimate(
-                action: .add,
-                withDuration: 0.3,
-                animations: { [weak self] in
-                    self?.view.layoutIfNeeded()
-                },
-                completion: nil)
-        } else {
-            view.layoutIfNeeded()
-        }
+        pullUpController.setup(superview: view, initialPoint: 0)
+        pullUpController.didMove(toParent: self)
+        parent?.view.layoutIfNeeded()
     }
     
     /**
@@ -430,7 +413,16 @@ extension UIViewController {
      - parameter pullUpController: the pull up controller to remove as a child from the current view controller.
      - parameter animated: Pass true to animate the removing; otherwise, pass false.
      */
-    open func removePullUpController(_ pullUpController: PullUpController, animated: Bool) {
+    open func removePullUpController(_ pullUpController: PullUpController,
+                                     animated: Bool,
+                                     completion: (() -> Void)? = nil) {
+
+        //check that pullup controller is in parent
+        guard pullUpController.parent != nil else {
+            completion?()
+            return
+        }
+
         pullUpController.hide()
         if animated {
             pullUpController.pullUpControllerAnimate(
@@ -443,12 +435,14 @@ extension UIViewController {
                     pullUpController.willMove(toParent: nil)
                     pullUpController.view.removeFromSuperview()
                     pullUpController.removeFromParent()
+                    completion?()
             })
         } else {
             view.layoutIfNeeded()
             pullUpController.willMove(toParent: nil)
             pullUpController.view.removeFromSuperview()
             pullUpController.removeFromParent()
+            completion?()
         }
     }
     
