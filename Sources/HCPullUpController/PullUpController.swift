@@ -177,10 +177,19 @@ open class PullUpController: UIViewController {
 
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        setupConstraints(initialPoint: pullUpControllerCurrentPointOffset)
-        coordinator.animate(alongsideTransition: { [weak self] coordinator in
-            self?.parent?.view?.layoutIfNeeded()
-        })
+        
+        let currentStickyPointIndex: Int = self.currentStickyPointIndex
+        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            
+            let initialPoint: CGFloat = self.pullUpControllerAllStickyPoints[currentStickyPointIndex]
+            self.pullUpControllerWillMove(to: initialPoint)
+            self.setupConstraints(initialPoint: initialPoint)
+            self.parent?.view.layoutIfNeeded()
+            self.pullUpControllerDidMove(to: initialPoint)
+        }
     }
 
     // MARK: - Setup
