@@ -175,21 +175,36 @@ open class PullUpController: UIViewController {
         UIView.animate(withDuration: duration, animations: animations, completion: completion)
     }
 
-    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
+    private var previousBounds: CGRect?
+    private var currentStickPointIndexBeforeLayout: Int?
+    
+    open override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        currentStickPointIndexBeforeLayout = currentStickyPointIndex
+    }
+    
+    open override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         
-        let currentStickyPointIndex: Int = self.currentStickyPointIndex
-        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-            guard let self = self else {
-                return
-            }
-            
-            let initialPoint: CGFloat = self.pullUpControllerAllStickyPoints[currentStickyPointIndex]
-            self.pullUpControllerWillMove(to: initialPoint)
-            self.setupConstraints(initialPoint: initialPoint)
-            self.parent?.view.layoutIfNeeded()
-            self.pullUpControllerDidMove(to: initialPoint)
+        defer {
+            self.previousBounds = view.bounds
         }
+        
+        guard
+            previousBounds != nil,
+            previousBounds != view.bounds,
+            let stickyPointIndex = currentStickPointIndexBeforeLayout
+            else {
+            return
+        }
+        
+        let initialPoint: CGFloat = self.pullUpControllerAllStickyPoints[stickyPointIndex]
+        self.pullUpControllerWillMove(to: initialPoint)
+        self.setupConstraints(initialPoint: initialPoint)
+        self.parent?.view.layoutIfNeeded()
+        self.pullUpControllerDidMove(to: initialPoint)
+        
+        currentStickPointIndexBeforeLayout = nil
     }
 
     // MARK: - Setup
