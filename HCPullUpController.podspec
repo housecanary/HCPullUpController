@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "HCPullUpController"
-  s.version      = "1.1.1"
+  s.version      = "1.1.2"
   s.license      = { :type => "MIT" }
   s.homepage     = "https://git.housecanary.net/Mobile-Team/HCPullUpController.git"
   s.author       = { "Justin Nguyen" => "jnguyen@housecanary.com" }
