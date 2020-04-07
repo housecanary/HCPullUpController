@@ -6,6 +6,7 @@ import PackageDescription
 let package = Package(
     name: "HCPullUpController",
     platforms: [
+        .macOS(.v10_15),
         .iOS(.v12)
     ],
     products: [

@@ -6,6 +6,7 @@
 //  Copyright © 2017 Mario. All rights reserved.
 //
 
+#if targetEnvironment(macCatalyst) || os(iOS)
 import UIKit
 
 open class PullUpController: UIViewController {
@@ -494,3 +495,4 @@ extension UIScrollView {
     }
 
 }
+#endif
